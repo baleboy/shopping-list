@@ -7,6 +7,7 @@ class ListPickerViewModel {
     var errorMessage: String?
 
     func loadLists() async {
+        guard lists.isEmpty else { return }
         isLoading = true
         errorMessage = nil
         do {

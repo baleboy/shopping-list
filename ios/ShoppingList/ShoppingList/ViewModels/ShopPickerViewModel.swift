@@ -14,6 +14,7 @@ class ShopPickerViewModel {
     }
 
     func loadShops() async {
+        guard shops.isEmpty else { return }
         isLoading = true
         errorMessage = nil
         do {

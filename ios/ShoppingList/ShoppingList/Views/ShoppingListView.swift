@@ -5,10 +5,10 @@ struct ShoppingListView: View {
     let shop: ShopProfile
     @State private var viewModel: ShoppingListViewModel
 
-    init(listName: String, shop: ShopProfile) {
+    init(listName: String, shop: ShopProfile, viewModel: ShoppingListViewModel? = nil) {
         self.listName = listName
         self.shop = shop
-        self._viewModel = State(initialValue: ShoppingListViewModel(listName: listName, shop: shop))
+        self._viewModel = State(initialValue: viewModel ?? ShoppingListViewModel(listName: listName, shop: shop))
     }
 
     var body: some View {
@@ -48,5 +48,31 @@ struct ShoppingListView: View {
         .navigationTitle("\(listName) (\(viewModel.itemsRemaining) left)")
         .refreshable { await viewModel.loadList() }
         .task { await viewModel.loadList() }
+    }
+}
+
+#Preview {
+    let shop = ShopProfile(id: "lidl", name: "Lidl Main Street", sections: ["produce", "dairy", "bakery"])
+    let viewModel = ShoppingListViewModel(listName: "master", shop: shop)
+    viewModel.categorizedList = CategorizedList(
+        listName: "master",
+        shop: "lidl",
+        sections: [
+            CategorizedSection(name: "produce", items: [
+                ShoppingItem(name: "bananas", checked: false),
+                ShoppingItem(name: "tomatoes", checked: true),
+                ShoppingItem(name: "onions", checked: false),
+            ]),
+            CategorizedSection(name: "dairy", items: [
+                ShoppingItem(name: "milk", checked: false),
+                ShoppingItem(name: "cheddar cheese", checked: false),
+            ]),
+            CategorizedSection(name: "bakery", items: [
+                ShoppingItem(name: "sourdough bread", checked: true),
+            ]),
+        ]
+    )
+    return NavigationStack {
+        ShoppingListView(listName: "master", shop: shop, viewModel: viewModel)
     }
 }

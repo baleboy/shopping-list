@@ -36,7 +36,8 @@ class ShoppingListViewModel {
     }
 
     func loadList() async {
-        isLoading = categorizedList == nil
+        guard categorizedList == nil else { return }
+        isLoading = true
         errorMessage = nil
         do {
             let list = try await APIClient.shared.prepareList(name: listName, shop: shop.id)

@@ -1,8 +1,13 @@
 import SwiftUI
 
 struct ShopPickerView: View {
-    @State private var viewModel = ShopPickerViewModel()
+    @State private var viewModel: ShopPickerViewModel
     @Binding var selectedShop: ShopProfile?
+
+    init(selectedShop: Binding<ShopProfile?>, viewModel: ShopPickerViewModel = ShopPickerViewModel()) {
+        self._selectedShop = selectedShop
+        self._viewModel = State(initialValue: viewModel)
+    }
 
     var body: some View {
         Group {
@@ -36,5 +41,16 @@ struct ShopPickerView: View {
         }
         .navigationTitle("Select Shop")
         .task { await viewModel.loadShops() }
+    }
+}
+
+#Preview {
+    let viewModel = ShopPickerViewModel()
+    viewModel.shops = [
+        ShopProfile(id: "lidl", name: "Lidl Main Street", sections: ["produce", "dairy", "bakery"]),
+        ShopProfile(id: "tesco", name: "Tesco Express", sections: ["fruit & veg", "dairy", "meat"]),
+    ]
+    return NavigationStack {
+        ShopPickerView(selectedShop: .constant(nil), viewModel: viewModel)
     }
 }
