@@ -1,0 +1,14 @@
+# Weekly Shopping
+- milk
+- eggs
+- bananas
+- chicken breast
+- sourdough bread
+- cheddar cheese
+- olive oil
+- tomatoes
+- onions
+- pasta
+- tinned tomatoes
+- frozen peas
+- kitchen roll
