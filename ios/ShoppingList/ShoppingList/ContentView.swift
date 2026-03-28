@@ -1,24 +1,14 @@
-//
-//  ContentView.swift
-//  ShoppingList
-//
-//  Created by Francesco Balestrieri on 28.3.2026.
-//
-
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @State private var selectedShop: ShopProfile?
 
-#Preview {
-    ContentView()
+    var body: some View {
+        NavigationStack {
+            ShopPickerView(selectedShop: $selectedShop)
+                .navigationDestination(item: $selectedShop) { shop in
+                    ListPickerView(shop: shop)
+                }
+        }
+    }
 }
