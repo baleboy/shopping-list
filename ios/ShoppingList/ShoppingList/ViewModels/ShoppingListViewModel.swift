@@ -35,9 +35,9 @@ class ShoppingListViewModel {
         return try? JSONDecoder().decode(CategorizedList.self, from: data)
     }
 
-    func loadList() async {
-        guard categorizedList == nil else { return }
-        isLoading = true
+    func loadList(forceRefresh: Bool = false) async {
+        guard forceRefresh || categorizedList == nil else { return }
+        isLoading = categorizedList == nil
         errorMessage = nil
         do {
             let list = try await APIClient.shared.prepareList(name: listName, shop: shop.id)

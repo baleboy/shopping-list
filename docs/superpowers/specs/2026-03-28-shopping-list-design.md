@@ -69,7 +69,7 @@ A lightweight server deployed on Fly.io.
 
 **Authentication:** Shared API key/token in request headers.
 
-**LLM Integration:** When `/prepare` is called, the server sends the item list and shop sections to the Claude API. Prompt: "Given these shop sections: [...], categorize each item: [...]. Return JSON mapping each item to its section." The result is cached as a JSON file so subsequent requests don't re-call the LLM.
+**LLM Integration:** When `/prepare` is called, the server sends the item list and shop sections to the Claude API. Prompt: "Given these shop sections: [...], categorize each item: [...]. Return JSON mapping each item to its section." The result is cached as a JSON file so subsequent requests don't re-call the LLM. The response is parsed with markdown code block stripping, since LLMs may wrap JSON in ` ```json ``` ` blocks. Items that the LLM assigns to a section not in the shop profile are collected into an "Other" catch-all section at the bottom of the list.
 
 **Categorized list format (JSON):**
 

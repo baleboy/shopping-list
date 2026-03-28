@@ -46,7 +46,7 @@ struct ShoppingListView: View {
             }
         }
         .navigationTitle("\(listName) (\(viewModel.itemsRemaining) left)")
-        .refreshable { await viewModel.loadList() }
+        .refreshable { await viewModel.loadList(forceRefresh: true) }
         .task { await viewModel.loadList() }
     }
 }
