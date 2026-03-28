@@ -1,10 +1,19 @@
 import json
+import re
 from pathlib import Path
 from typing import Optional, List, Dict
 from anthropic import Anthropic
 from app.config import settings
 from app.models import ShopProfile, ShoppingItem, CategorizedSection, CategorizedList
 from app.services.list_service import get_list
+
+
+def _extract_json(text: str) -> str:
+    """Extract JSON from LLM response, stripping markdown code blocks if present."""
+    match = re.search(r'```(?:json)?\s*\n?(.*?)\n?```', text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return text.strip()
 
 
 def _get_client() -> Anthropic:
@@ -31,7 +40,7 @@ def categorize_items(items: List[str], sections: List[str]) -> Dict[str, str]:
         max_tokens=1024,
         messages=[{"role": "user", "content": prompt}]
     )
-    return json.loads(response.content[0].text)
+    return json.loads(_extract_json(response.content[0].text))
 
 
 def get_or_create_categorized_list(list_name: str, shop: ShopProfile) -> Optional[CategorizedList]:
@@ -48,14 +57,23 @@ def get_or_create_categorized_list(list_name: str, shop: ShopProfile) -> Optiona
     mapping = categorize_items(items, shop.sections)
 
     sections = []
+    matched_items = set()
     for section_name in shop.sections:
-        section_items = [
-            ShoppingItem(name=item)
-            for item, assigned in mapping.items()
-            if assigned == section_name
-        ]
+        section_items = []
+        for item, assigned in mapping.items():
+            if assigned == section_name:
+                section_items.append(ShoppingItem(name=item))
+                matched_items.add(item)
         if section_items:
             sections.append(CategorizedSection(name=section_name, items=section_items))
+
+    other_items = [
+        ShoppingItem(name=item)
+        for item in mapping
+        if item not in matched_items
+    ]
+    if other_items:
+        sections.append(CategorizedSection(name="other", items=other_items))
 
     result = CategorizedList(
         list_name=list_name,
