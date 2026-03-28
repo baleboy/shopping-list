@@ -19,13 +19,36 @@ class ShoppingListViewModel {
         return list.sections.flatMap(\.items).filter { !$0.checked }.count
     }
 
+    private var cacheURL: URL {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return docs.appendingPathComponent("cache_\(listName)_\(shop.id).json")
+    }
+
+    private func saveToCache(_ list: CategorizedList) {
+        if let data = try? JSONEncoder().encode(list) {
+            try? data.write(to: cacheURL)
+        }
+    }
+
+    private func loadFromCache() -> CategorizedList? {
+        guard let data = try? Data(contentsOf: cacheURL) else { return nil }
+        return try? JSONDecoder().decode(CategorizedList.self, from: data)
+    }
+
     func loadList() async {
-        isLoading = true
+        isLoading = categorizedList == nil
         errorMessage = nil
         do {
-            categorizedList = try await APIClient.shared.prepareList(name: listName, shop: shop.id)
+            let list = try await APIClient.shared.prepareList(name: listName, shop: shop.id)
+            categorizedList = list
+            saveToCache(list)
         } catch {
-            errorMessage = "Failed to load list: \(error.localizedDescription)"
+            if categorizedList == nil {
+                categorizedList = loadFromCache()
+            }
+            if categorizedList == nil {
+                errorMessage = "Failed to load list: \(error.localizedDescription)"
+            }
         }
         isLoading = false
     }
@@ -40,6 +63,7 @@ class ShoppingListViewModel {
         // Optimistic update
         list.sections[sectionIndex].items[itemIndex].checked.toggle()
         categorizedList = list
+        saveToCache(list)
 
         do {
             try await APIClient.shared.toggleItem(listName: listName, item: item.name, shop: shop.id)
