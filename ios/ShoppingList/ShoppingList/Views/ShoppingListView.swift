@@ -3,9 +3,50 @@ import SwiftUI
 struct ShoppingListView: View {
     let listName: String
     let shop: ShopProfile
+    @State private var viewModel: ShoppingListViewModel
+
+    init(listName: String, shop: ShopProfile) {
+        self.listName = listName
+        self.shop = shop
+        self._viewModel = State(initialValue: ShoppingListViewModel(listName: listName, shop: shop))
+    }
 
     var body: some View {
-        Text("Shopping: \(listName) at \(shop.name)")
-            .navigationTitle(listName)
+        Group {
+            if viewModel.isLoading {
+                ProgressView("Preparing list...")
+            } else if let error = viewModel.errorMessage {
+                VStack(spacing: 16) {
+                    Text(error)
+                        .foregroundStyle(.secondary)
+                    Button("Retry") {
+                        Task { await viewModel.loadList() }
+                    }
+                }
+            } else if let list = viewModel.categorizedList {
+                List {
+                    ForEach(list.sections) { section in
+                        Section(section.name.capitalized) {
+                            ForEach(section.items) { item in
+                                Button {
+                                    Task { await viewModel.toggleItem(item, inSection: section) }
+                                } label: {
+                                    HStack {
+                                        Image(systemName: item.checked ? "checkmark.circle.fill" : "circle")
+                                            .foregroundStyle(item.checked ? .green : .primary)
+                                        Text(item.name)
+                                            .strikethrough(item.checked)
+                                            .foregroundStyle(item.checked ? .secondary : .primary)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("\(listName) (\(viewModel.itemsRemaining) left)")
+        .refreshable { await viewModel.loadList() }
+        .task { await viewModel.loadList() }
     }
 }
