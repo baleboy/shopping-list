@@ -124,16 +124,28 @@ Three screens:
 | Component | Platform | Cost |
 |-----------|----------|------|
 | Backend | Fly.io (free tier or ~$5/mo) | Free–$5/mo |
-| Data/lists | Private GitHub repo | Free |
+| Data/lists | GitHub repo (can be public) | Free |
 | LLM | Claude API | ~cents/month |
 | iOS app | TestFlight (household distribution) | $99/year (Apple Developer) |
 
 **Server deployment:**
-1. FastAPI app in its own repo with a Dockerfile
-2. `fly launch` + `fly deploy`
-3. GitHub webhook on the shopping list repo pointing to the server
-4. Claude API key, GitHub webhook secret, and auth token as Fly secrets
-5. Persistent Fly volume for data directory
+1. `cd server && fly launch` — creates the app and `fly.toml`
+2. Configure `fly.toml`: set `SHOPPING_DATA_DIR = "/data"` env var, add a `[mounts]` section for persistent volume
+3. `fly volumes create shopping_data -r REGION -n 1` — persistent volume for data + cache
+4. Set secrets (names must match `SHOPPING_` env prefix):
+   ```
+   fly secrets set SHOPPING_ANTHROPIC_API_KEY=...
+   fly secrets set SHOPPING_API_KEY=...
+   fly secrets set SHOPPING_GITHUB_WEBHOOK_SECRET=...
+   ```
+5. `fly deploy` — builds and deploys; `start.sh` clones the data repo into `/data` on first boot, pulls on subsequent boots
+6. GitHub webhook on the data repo: Settings → Webhooks → Add webhook, payload URL `https://your-app.fly.dev/webhook`, content type `application/json`, secret matching `SHOPPING_GITHUB_WEBHOOK_SECRET`
+7. Update iOS `APIClient.swift` with the Fly URL (`https://your-app.fly.dev`, no port) and the `SHOPPING_API_KEY` value
+
+**Important notes:**
+- Fly serves on standard HTTPS (port 443), not 8080 — the internal port is only used inside the container
+- The data repo can be public (webhook secret ensures only genuine GitHub payloads trigger pulls)
+- `start.sh` handles the case where the volume mount directory already exists (non-empty) by cloning to a temp dir and moving files
 
 ## Workflow
 
