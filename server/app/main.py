@@ -5,16 +5,17 @@ from app.routers import shops, lists, webhook
 
 app = FastAPI(title="Shopping List API")
 
-app.include_router(shops.router)
-app.include_router(lists.router)
-app.include_router(webhook.router)
-
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
 async def verify_api_key(key: str = Security(api_key_header)):
     if settings.api_key and key != settings.api_key:
         raise HTTPException(status_code=401, detail="Invalid API key")
+
+
+app.include_router(shops.router, dependencies=[Depends(verify_api_key)])
+app.include_router(lists.router, dependencies=[Depends(verify_api_key)])
+app.include_router(webhook.router)
 
 
 @app.get("/health")
