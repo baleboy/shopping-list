@@ -1,12 +1,13 @@
 from fastapi import FastAPI, Depends, HTTPException, Security
 from fastapi.security import APIKeyHeader
 from app.config import settings
-from app.routers import shops, lists
+from app.routers import shops, lists, webhook
 
 app = FastAPI(title="Shopping List API")
 
 app.include_router(shops.router)
 app.include_router(lists.router)
+app.include_router(webhook.router)
 
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
