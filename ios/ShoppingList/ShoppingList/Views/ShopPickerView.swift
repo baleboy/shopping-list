@@ -3,6 +3,11 @@ import SwiftUI
 struct ShopPickerView: View {
     @State private var viewModel: ShopPickerViewModel
     @Binding var selectedShop: ShopProfile?
+    @State private var showingAddAlert = false
+    @State private var newShopName = ""
+    @State private var shopToEdit: ShopProfile?
+    @State private var showingDeleteConfirm = false
+    @State private var shopToDelete: ShopProfile?
 
     init(selectedShop: Binding<ShopProfile?>, viewModel: ShopPickerViewModel = ShopPickerViewModel()) {
         self._selectedShop = selectedShop
@@ -18,7 +23,7 @@ struct ShopPickerView: View {
                     Text(error)
                         .foregroundStyle(.secondary)
                     Button("Retry") {
-                        Task { await viewModel.loadShops() }
+                        Task { await viewModel.loadShops(forceRefresh: true) }
                     }
                 }
             } else {
@@ -36,10 +41,58 @@ struct ShopPickerView: View {
                             }
                         }
                     }
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            shopToDelete = shop
+                            showingDeleteConfirm = true
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        Button {
+                            shopToEdit = shop
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(.blue)
+                    }
                 }
             }
         }
         .navigationTitle("Select Shop")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    newShopName = ""
+                    showingAddAlert = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .alert("New Shop", isPresented: $showingAddAlert) {
+            TextField("Shop name", text: $newShopName)
+            Button("Cancel", role: .cancel) {}
+            Button("Add") {
+                Task { await viewModel.createShop(name: newShopName) }
+            }
+        }
+        .alert("Delete Shop?", isPresented: $showingDeleteConfirm) {
+            Button("Cancel", role: .cancel) {}
+            Button("Delete", role: .destructive) {
+                if let shop = shopToDelete {
+                    Task { await viewModel.deleteShop(shop) }
+                }
+            }
+        } message: {
+            if let shop = shopToDelete {
+                Text("Delete \"\(shop.name)\"? This cannot be undone.")
+            }
+        }
+        .navigationDestination(item: $shopToEdit) { shop in
+            ShopEditorView(shop: shop) {
+                Task { await viewModel.loadShops(forceRefresh: true) }
+            }
+        }
         .task { await viewModel.loadShops() }
     }
 }
