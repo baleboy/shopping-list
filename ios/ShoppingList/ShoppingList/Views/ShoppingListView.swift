@@ -6,6 +6,7 @@ struct ShoppingListView: View {
     @State private var viewModel: ShoppingListViewModel
     @AppStorage("hidePurchased") private var hidePurchased = false
     @State private var isReorderingSections = false
+    @State private var showConfetti = false
 
     init(listName: String, shop: ShopProfile, viewModel: ShoppingListViewModel? = nil) {
         self.listName = listName
@@ -67,6 +68,12 @@ struct ShoppingListView: View {
                         }
                     }
                 }
+            }
+        }
+        .overlay { ConfettiView(isActive: $showConfetti) }
+        .onChange(of: viewModel.itemsRemaining) { oldValue, newValue in
+            if newValue == 0 && oldValue > 0 {
+                showConfetti = true
             }
         }
         .navigationTitle("\(listName) (\(viewModel.itemsRemaining) left)")
