@@ -31,16 +31,16 @@ struct ShoppingListView: View {
                         if !visibleItems.isEmpty {
                             Section(section.name.capitalized) {
                                 ForEach(visibleItems) { item in
-                                    Button {
+                                    HStack {
+                                        Image(systemName: item.checked ? "checkmark.circle.fill" : "circle")
+                                            .foregroundStyle(item.checked ? .green : .primary)
+                                        Text(item.name)
+                                            .strikethrough(item.checked)
+                                            .foregroundStyle(item.checked ? .secondary : .primary)
+                                    }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
                                         Task { await viewModel.toggleItem(item, inSection: section) }
-                                    } label: {
-                                        HStack {
-                                            Image(systemName: item.checked ? "checkmark.circle.fill" : "circle")
-                                                .foregroundStyle(item.checked ? .green : .primary)
-                                            Text(item.name)
-                                                .strikethrough(item.checked)
-                                                .foregroundStyle(item.checked ? .secondary : .primary)
-                                        }
                                     }
                                 }
                             }
