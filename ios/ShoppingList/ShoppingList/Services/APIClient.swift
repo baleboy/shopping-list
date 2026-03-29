@@ -49,6 +49,23 @@ class APIClient {
     func toggleItem(listName: String, item: String, shop: String) async throws {
         _ = try await request("/lists/\(listName)/items/\(item)", method: "PATCH", query: ["shop": shop])
     }
+
+    func createShop(name: String) async throws -> ShopProfile {
+        let body = try JSONEncoder().encode(["name": name])
+        let data = try await request("/shops", method: "POST", body: body)
+        return try JSONDecoder().decode(ShopProfile.self, from: data)
+    }
+
+    func updateShop(id: String, name: String, sections: [String]) async throws -> ShopProfile {
+        let payload: [String: Any] = ["name": name, "sections": sections]
+        let body = try JSONSerialization.data(withJSONObject: payload)
+        let data = try await request("/shops/\(id)", method: "PUT", body: body)
+        return try JSONDecoder().decode(ShopProfile.self, from: data)
+    }
+
+    func deleteShop(id: String) async throws {
+        _ = try await request("/shops/\(id)", method: "DELETE")
+    }
 }
 
 enum APIError: Error {

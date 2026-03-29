@@ -4,6 +4,7 @@ struct ShoppingListView: View {
     let listName: String
     let shop: ShopProfile
     @State private var viewModel: ShoppingListViewModel
+    @AppStorage("hidePurchased") private var hidePurchased = false
 
     init(listName: String, shop: ShopProfile, viewModel: ShoppingListViewModel? = nil) {
         self.listName = listName
@@ -26,17 +27,20 @@ struct ShoppingListView: View {
             } else if let list = viewModel.categorizedList {
                 List {
                     ForEach(list.sections) { section in
-                        Section(section.name.capitalized) {
-                            ForEach(section.items) { item in
-                                Button {
-                                    Task { await viewModel.toggleItem(item, inSection: section) }
-                                } label: {
-                                    HStack {
-                                        Image(systemName: item.checked ? "checkmark.circle.fill" : "circle")
-                                            .foregroundStyle(item.checked ? .green : .primary)
-                                        Text(item.name)
-                                            .strikethrough(item.checked)
-                                            .foregroundStyle(item.checked ? .secondary : .primary)
+                        let visibleItems = hidePurchased ? section.items.filter { !$0.checked } : section.items
+                        if !visibleItems.isEmpty {
+                            Section(section.name.capitalized) {
+                                ForEach(visibleItems) { item in
+                                    Button {
+                                        Task { await viewModel.toggleItem(item, inSection: section) }
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: item.checked ? "checkmark.circle.fill" : "circle")
+                                                .foregroundStyle(item.checked ? .green : .primary)
+                                            Text(item.name)
+                                                .strikethrough(item.checked)
+                                                .foregroundStyle(item.checked ? .secondary : .primary)
+                                        }
                                     }
                                 }
                             }
@@ -46,6 +50,13 @@ struct ShoppingListView: View {
             }
         }
         .navigationTitle("\(listName) (\(viewModel.itemsRemaining) left)")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Toggle(isOn: $hidePurchased) {
+                    Image(systemName: hidePurchased ? "eye.slash" : "eye")
+                }
+            }
+        }
         .refreshable { await viewModel.loadList(forceRefresh: true) }
         .task { await viewModel.loadList() }
     }
