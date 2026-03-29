@@ -13,9 +13,9 @@ class ShopPickerViewModel {
         set { UserDefaults.standard.set(newValue, forKey: lastShopKey) }
     }
 
-    func loadShops() async {
-        guard shops.isEmpty else { return }
-        isLoading = true
+    func loadShops(forceRefresh: Bool = false) async {
+        guard forceRefresh || shops.isEmpty else { return }
+        isLoading = shops.isEmpty
         errorMessage = nil
         do {
             shops = try await APIClient.shared.getShops()
@@ -27,5 +27,25 @@ class ShopPickerViewModel {
 
     func selectShop(_ shop: ShopProfile) {
         lastSelectedShopId = shop.id
+    }
+
+    func createShop(name: String) async -> ShopProfile? {
+        do {
+            let shop = try await APIClient.shared.createShop(name: name)
+            await loadShops(forceRefresh: true)
+            return shop
+        } catch {
+            errorMessage = "Failed to create shop: \(error.localizedDescription)"
+            return nil
+        }
+    }
+
+    func deleteShop(_ shop: ShopProfile) async {
+        do {
+            try await APIClient.shared.deleteShop(id: shop.id)
+            await loadShops(forceRefresh: true)
+        } catch {
+            errorMessage = "Failed to delete shop: \(error.localizedDescription)"
+        }
     }
 }
