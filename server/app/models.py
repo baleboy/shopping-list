@@ -21,3 +21,12 @@ class CategorizedList(BaseModel):
     list_name: str
     shop: str
     sections: list[CategorizedSection]
+
+
+class CreateShopRequest(BaseModel):
+    name: str
+
+
+class UpdateShopRequest(BaseModel):
+    name: str
+    sections: list[str]
