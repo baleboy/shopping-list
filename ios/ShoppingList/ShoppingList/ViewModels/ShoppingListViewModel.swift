@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 @Observable
 class ShoppingListViewModel {
@@ -52,6 +53,30 @@ class ShoppingListViewModel {
             }
         }
         isLoading = false
+    }
+
+    func moveSections(from source: IndexSet, to destination: Int) {
+        guard var list = categorizedList else { return }
+        list.sections.move(fromOffsets: source, toOffset: destination)
+        categorizedList = list
+        saveToCache(list)
+
+        // Persist new section order to the shop profile
+        let newSectionOrder = list.sections.map(\.name)
+        Task {
+            _ = try? await APIClient.shared.updateShop(id: shop.id, name: shop.name, sections: newSectionOrder)
+        }
+    }
+
+    func resetAllItems() {
+        guard var list = categorizedList else { return }
+        for sectionIndex in list.sections.indices {
+            for itemIndex in list.sections[sectionIndex].items.indices {
+                list.sections[sectionIndex].items[itemIndex].checked = false
+            }
+        }
+        categorizedList = list
+        saveToCache(list)
     }
 
     func toggleItem(_ item: ShoppingItem, inSection section: CategorizedSection) async {

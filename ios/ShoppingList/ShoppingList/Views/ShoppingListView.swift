@@ -5,6 +5,7 @@ struct ShoppingListView: View {
     let shop: ShopProfile
     @State private var viewModel: ShoppingListViewModel
     @AppStorage("hidePurchased") private var hidePurchased = false
+    @State private var isReorderingSections = false
 
     init(listName: String, shop: ShopProfile, viewModel: ShoppingListViewModel? = nil) {
         self.listName = listName
@@ -25,22 +26,41 @@ struct ShoppingListView: View {
                     }
                 }
             } else if let list = viewModel.categorizedList {
-                List {
-                    ForEach(list.sections) { section in
-                        let visibleItems = hidePurchased ? section.items.filter { !$0.checked } : section.items
-                        if !visibleItems.isEmpty {
-                            Section(section.name.capitalized) {
-                                ForEach(visibleItems) { item in
-                                    HStack {
-                                        Image(systemName: item.checked ? "checkmark.circle.fill" : "circle")
-                                            .foregroundStyle(item.checked ? .green : .primary)
-                                        Text(item.name)
-                                            .strikethrough(item.checked)
-                                            .foregroundStyle(item.checked ? .secondary : .primary)
-                                    }
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        Task { await viewModel.toggleItem(item, inSection: section) }
+                if isReorderingSections {
+                    List {
+                        ForEach(list.sections) { section in
+                            HStack {
+                                Image(systemName: "line.3.horizontal")
+                                    .foregroundStyle(.secondary)
+                                Text(section.name.capitalized)
+                                Spacer()
+                                Text("\(section.items.count)")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .onMove { source, destination in
+                            viewModel.moveSections(from: source, to: destination)
+                        }
+                    }
+                    .environment(\.editMode, .constant(.active))
+                } else {
+                    List {
+                        ForEach(list.sections) { section in
+                            let visibleItems = hidePurchased ? section.items.filter { !$0.checked } : section.items
+                            if !visibleItems.isEmpty {
+                                Section(section.name.capitalized) {
+                                    ForEach(visibleItems) { item in
+                                        HStack {
+                                            Image(systemName: item.checked ? "checkmark.circle.fill" : "circle")
+                                                .foregroundStyle(item.checked ? .green : .primary)
+                                            Text(item.name)
+                                                .strikethrough(item.checked)
+                                                .foregroundStyle(item.checked ? .secondary : .primary)
+                                        }
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            Task { await viewModel.toggleItem(item, inSection: section) }
+                                        }
                                     }
                                 }
                             }
@@ -55,6 +75,22 @@ struct ShoppingListView: View {
                 Toggle(isOn: $hidePurchased) {
                     Image(systemName: hidePurchased ? "eye.slash" : "eye")
                 }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    viewModel.resetAllItems()
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                }
+                .disabled(viewModel.itemsRemaining == (viewModel.categorizedList?.sections.flatMap(\.items).count ?? 0))
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isReorderingSections.toggle()
+                } label: {
+                    Image(systemName: isReorderingSections ? "checkmark" : "arrow.up.arrow.down")
+                }
+                .disabled(viewModel.categorizedList == nil)
             }
         }
         .refreshable { await viewModel.loadList(forceRefresh: true) }
