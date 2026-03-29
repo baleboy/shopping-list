@@ -4,8 +4,8 @@ Write your shopping list at home in markdown. See it on your phone sorted by ais
 
 ## How It Works
 
-1. **At home** — edit a markdown file (`lists/master.md`) in your favorite editor
-2. **Push** — `git push` to your data repo; a webhook syncs it to the server
+1. **At home** — edit your shopping list in the web app (or markdown if you prefer)
+2. **Sync** — hit Sync in the web app, or `git push`; a webhook keeps the server in sync
 3. **In the shop** — open the iOS app, pick your shop, and see items sorted by section
 4. **Shop** — tap items to check them off as you go
 
@@ -85,7 +85,7 @@ SHOPPING_DATA_DIR=/path/to/your/data-repo SHOPPING_ANTHROPIC_API_KEY=your-key uv
 fly launch
 fly volumes create shopping_data -r REGION -n 1
 fly secrets set SHOPPING_ANTHROPIC_API_KEY=your-anthropic-key
-fly secrets set SHOPPING_API_KEY=$(openssl rand -hex 32)
+fly secrets set SHOPPING_API_KEY=your-password
 fly secrets set SHOPPING_GITHUB_WEBHOOK_SECRET=$(openssl rand -hex 32)
 fly deploy
 ```
@@ -126,4 +126,5 @@ cd ios/ShoppingList && xcodebuild test -scheme ShoppingList -destination 'platfo
 - **iOS App:** SwiftUI with four screens (shop picker, shop editor, list picker, shopping list). Offline caching for use without connectivity.
 - **Shop Management:** Shops can be created, edited (sections reordered), and deleted from the iOS app. Changes are stored server-side and take priority over git-synced YAML profiles.
 - **LLM Integration:** Claude API categorizes items into shop sections. Results are cached server-side so subsequent requests are instant.
-- **Sync:** Git-based. Push lists from home, webhook triggers server pull. Check-off state stored server-side and shared across household devices.
+- **Web Frontend:** Single-page app served at `/` for managing lists in the browser. Password-protected using the API key. No build step — just a single HTML file with inline CSS/JS.
+- **Sync:** Git-based. Push lists from home (or hit Sync in the web app), webhook triggers server pull. Check-off state stored server-side and shared across household devices.
