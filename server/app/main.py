@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, Security
 from fastapi.security import APIKeyHeader
 from app.config import settings
-from app.routers import shops, lists, webhook
+from app.routers import shops, lists, webhook, sync
 
 app = FastAPI(title="Shopping List API")
 
@@ -16,6 +16,7 @@ async def verify_api_key(key: str = Security(api_key_header)):
 app.include_router(shops.router, dependencies=[Depends(verify_api_key)])
 app.include_router(lists.router, dependencies=[Depends(verify_api_key)])
 app.include_router(webhook.router)
+app.include_router(sync.router, dependencies=[Depends(verify_api_key)])
 
 
 @app.get("/health")
