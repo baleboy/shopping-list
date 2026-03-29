@@ -3,8 +3,8 @@ import Foundation
 class APIClient {
     static let shared = APIClient()
 
-    private var baseURL = URL(string: "https://server-patient-frost-6137.fly.dev")!
-    private var apiKey = "88e6d7665f902358ddf20e9e48cf8164b6f46267a7d80b3a3142403f0b1a87f1"
+    private var baseURL = URL(string: AppConfig.apiBaseURL)!
+    private var apiKey = AppConfig.apiKey
 
     func configure(baseURL: URL, apiKey: String) {
         self.baseURL = baseURL

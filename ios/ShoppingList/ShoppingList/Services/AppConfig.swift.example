@@ -1,0 +1,8 @@
+// Copy this file to AppConfig.swift and fill in your values.
+// AppConfig.swift is gitignored — never commit it.
+import Foundation
+
+enum AppConfig {
+    static let apiBaseURL = "https://your-app.fly.dev"
+    static let apiKey = "your-api-key-here"
+}
