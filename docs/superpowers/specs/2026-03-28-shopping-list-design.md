@@ -61,9 +61,12 @@ A lightweight server deployed on Fly.io.
 | `GET` | `/shops/{id}` | Get a shop profile |
 | `POST` | `/lists/{name}/prepare?shop={id}` | Categorize & sort list for a shop |
 | `PATCH` | `/lists/{name}/items/{item}` | Toggle item checked/unchecked |
+| `POST` | `/shops` | Create a new shop with default sections |
+| `PUT` | `/shops/{id}` | Update shop name and sections |
+| `DELETE` | `/shops/{id}` | Delete a shop |
 | `POST` | `/webhook` | GitHub webhook to trigger git pull |
 
-**Storage:** Files on disk — markdown lists, YAML profiles, and a JSON file per session for categorized/checked state. No database.
+**Storage:** Files on disk — markdown lists, YAML profiles, and a JSON file per session for categorized/checked state. No database. Shops edited from the app are stored server-side in `cache/shops/` as JSON, separate from git-synced YAML files. App edits take priority over YAML. Deleting a git-synced shop creates a tombstone in the cache.
 
 **Sync:** The server's data directory is a clone of the GitHub repo. A GitHub webhook triggers `git pull` when changes are pushed.
 
@@ -97,11 +100,19 @@ A lightweight server deployed on Fly.io.
 
 ### 4. iOS App (SwiftUI)
 
-Three screens:
+Four screens:
 
 **Shop Picker (launch screen):**
 - Lists available shops from `GET /shops`
 - Tap to select; remembers last-used shop
+- Add new shops via + button (creates with default sections)
+- Swipe left to edit (opens Shop Editor) or delete
+
+**Shop Editor:**
+- Edit shop name
+- Drag to reorder sections
+- Add or delete sections
+- Saves to server via `PUT /shops/{id}`
 
 **Shopping List:**
 - Fetches categorized list from backend

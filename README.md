@@ -123,6 +123,7 @@ cd ios/ShoppingList && xcodebuild test -scheme ShoppingList -destination 'platfo
 ## Architecture
 
 - **Backend:** Python/FastAPI with file-based storage (no database). Markdown lists and YAML shop profiles on disk, cached categorization results as JSON.
-- **iOS App:** SwiftUI with three screens (shop picker, list picker, shopping list). Offline caching for use without connectivity.
+- **iOS App:** SwiftUI with four screens (shop picker, shop editor, list picker, shopping list). Offline caching for use without connectivity.
+- **Shop Management:** Shops can be created, edited (sections reordered), and deleted from the iOS app. Changes are stored server-side and take priority over git-synced YAML profiles.
 - **LLM Integration:** Claude API categorizes items into shop sections. Results are cached server-side so subsequent requests are instant.
 - **Sync:** Git-based. Push lists from home, webhook triggers server pull. Check-off state stored server-side and shared across household devices.
