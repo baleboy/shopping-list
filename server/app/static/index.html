@@ -654,7 +654,9 @@
         const name = prompt("List name:");
         if (!name || !name.trim()) return;
         const trimmed = name.trim();
-        await api("POST", "/lists", { name: trimmed });
+        const fromMaster = lists.includes("master") && confirm("Copy items from master list?");
+        const path = fromMaster ? "/lists?from=master" : "/lists";
+        await api("POST", path, { name: trimmed });
         lists.push(trimmed);
         lists.sort();
         renderSidebar();
