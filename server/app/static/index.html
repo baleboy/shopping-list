@@ -431,6 +431,196 @@
             font-size: 0.95rem;
         }
 
+        /* ===== Sidebar Mode Toggle ===== */
+        .sidebar-mode-toggle {
+            display: flex;
+            background: var(--sand);
+            border-radius: var(--radius);
+            margin: 0.75rem 0.75rem 0;
+            padding: 3px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.4rem 0;
+            border: none;
+            border-radius: 7px;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--cocoa);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mode-btn:not(.active):hover {
+            color: var(--cocoa);
+        }
+
+        /* ===== Shop Editor ===== */
+        .shop-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .shop-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .shop-field label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .shop-field input[type="text"] {
+            padding: 0.7rem 0.9rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--warm-white);
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .shop-field input[type="text"]:focus {
+            outline: none;
+            border-color: var(--cocoa-light);
+            box-shadow: 0 0 0 3px rgba(166,139,91,0.15);
+        }
+
+        .section-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .section-row {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--warm-white);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            padding: 0.35rem 0.5rem;
+            transition: border-color 0.15s;
+        }
+
+        .section-row:focus-within {
+            border-color: var(--cocoa-light);
+        }
+
+        .section-row .section-num {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            min-width: 1.2rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .section-row input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 0.92rem;
+            font-family: inherit;
+            color: var(--text);
+            outline: none;
+            padding: 0.3rem 0;
+        }
+
+        .section-row input::placeholder {
+            color: var(--sand-dark);
+            font-style: italic;
+        }
+
+        .move-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.15s, color 0.15s;
+            flex-shrink: 0;
+        }
+
+        .move-btn:hover {
+            background: var(--sand);
+            color: var(--cocoa);
+        }
+
+        .move-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .move-btn:disabled:hover {
+            background: none;
+            color: var(--text-muted);
+        }
+
+        .delete-section-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.15rem;
+            line-height: 1;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+            flex-shrink: 0;
+        }
+
+        .delete-section-btn:hover {
+            color: var(--terracotta);
+            background: rgba(196,112,75,0.1);
+        }
+
+        .add-section-btn {
+            padding: 0.5rem;
+            background: none;
+            border: 1.5px dashed var(--sand-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--cocoa);
+            font-size: 0.85rem;
+            font-family: inherit;
+            font-weight: 500;
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+        }
+
+        .add-section-btn:hover {
+            border-color: var(--cocoa-light);
+            background: var(--sand);
+            color: var(--cocoa-dark);
+        }
+
         /* ===== Mobile ===== */
         @media (max-width: 768px) {
             .hamburger { display: flex; align-items: center; justify-content: center; }
@@ -472,6 +662,20 @@
 
             .editor-header h2 {
                 font-size: 1.2rem;
+            }
+
+            .section-row {
+                padding: 0.45rem 0.6rem;
+            }
+
+            .move-btn {
+                min-width: 34px;
+                min-height: 34px;
+            }
+
+            .delete-section-btn {
+                min-width: 34px;
+                min-height: 34px;
             }
         }
 
@@ -519,7 +723,11 @@
     <div class="overlay" onclick="toggleSidebar()"></div>
     <div class="main">
         <div class="sidebar">
-            <div class="sidebar-label">Your lists</div>
+            <div class="sidebar-mode-toggle">
+                <button class="mode-btn active" id="mode-lists" onclick="switchMode('lists')">Lists</button>
+                <button class="mode-btn" id="mode-shops" onclick="switchMode('shops')">Stores</button>
+            </div>
+            <div class="sidebar-label" id="sidebar-label">Your lists</div>
             <div class="sidebar-list" id="sidebar-list"></div>
             <div class="sidebar-footer">
                 <button class="new-btn" onclick="createNewList()">+ New list</button>
@@ -539,6 +747,10 @@
     let lists = [];
     let currentList = null;
     let originalContent = "";
+    let currentMode = "lists";
+    let shops = [];
+    let currentShop = null;
+    let originalShop = null;
 
     // --- API helpers ---
     async function api(method, path, body) {
@@ -578,16 +790,68 @@
         } catch (e) { /* login screen stays visible */ }
     }
 
+    // --- Mode switching ---
+    function switchMode(mode) {
+        if (mode === currentMode) return;
+        if (hasUnsavedChanges() && !confirm("You have unsaved changes. Discard them?")) return;
+        currentMode = mode;
+        currentList = null;
+        currentShop = null;
+        originalShop = null;
+        originalContent = "";
+        updateModeToggle();
+        document.querySelector(".header h1").textContent = mode === "lists" ? "Shopping Lists" : "Store Manager";
+        if (mode === "shops") {
+            loadShops();
+        } else {
+            renderSidebar();
+        }
+        renderEmptyState();
+    }
+
+    function updateModeToggle() {
+        document.getElementById("mode-lists").classList.toggle("active", currentMode === "lists");
+        document.getElementById("mode-shops").classList.toggle("active", currentMode === "shops");
+    }
+
+    function renderEmptyState() {
+        const icon = currentMode === "lists" ? "&#128221;" : "&#127978;";
+        const msg = currentMode === "lists" ? "Select or create a list to get started" : "Select or create a store to get started";
+        document.getElementById("editor").innerHTML = `
+            <div class="empty-state">
+                <span class="empty-icon" aria-hidden="true">${icon}</span>
+                <p>${msg}</p>
+            </div>
+        `;
+    }
+
     // --- Sidebar ---
     function renderSidebar() {
+        updateModeToggle();
+        const label = document.getElementById("sidebar-label");
         const el = document.getElementById("sidebar-list");
-        el.innerHTML = lists.map(name => `
-            <div class="sidebar-item ${name === currentList ? 'active' : ''}" onclick="selectList('${name.replace(/'/g, "\\'")}')">
-                <span class="item-icon">&#128203;</span>
-                <span>${escapeHtml(name)}</span>
-                <button class="delete-btn" onclick="event.stopPropagation(); deleteList('${name.replace(/'/g, "\\'")}')" aria-label="Delete ${escapeHtml(name)}">&times;</button>
-            </div>
-        `).join("");
+        const footer = document.querySelector(".sidebar-footer");
+        if (currentMode === "shops") {
+            label.textContent = "Your stores";
+            el.innerHTML = shops.map(shop => `
+                <div class="sidebar-item ${currentShop && shop.id === currentShop.id ? 'active' : ''}" onclick="selectShop('${shop.id}')">
+                    <span class="item-icon">&#127978;</span>
+                    <span>${escapeHtml(shop.name)}</span>
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteShop('${shop.id}')" aria-label="Delete ${escapeHtml(shop.name)}">&times;</button>
+                </div>
+            `).join("");
+            footer.innerHTML = `<button class="new-btn" onclick="createNewShop()">+ New store</button>`;
+        } else {
+            label.textContent = "Your lists";
+            el.innerHTML = lists.map(name => `
+                <div class="sidebar-item ${name === currentList ? 'active' : ''}" onclick="selectList('${name.replace(/'/g, "\\'")}')">
+                    <span class="item-icon">&#128203;</span>
+                    <span>${escapeHtml(name)}</span>
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteList('${name.replace(/'/g, "\\'")}')" aria-label="Delete ${escapeHtml(name)}">&times;</button>
+                </div>
+            `).join("");
+            footer.innerHTML = `<button class="new-btn" onclick="createNewList()">+ New list</button>`;
+        }
     }
 
     function escapeHtml(str) {
@@ -598,8 +862,17 @@
 
     // --- List operations ---
     function hasUnsavedChanges() {
+        if (currentMode === "shops") return hasUnsavedShopChanges();
         const ta = document.querySelector("#editor textarea");
         return ta && ta.value !== originalContent;
+    }
+
+    function hasUnsavedShopChanges() {
+        if (!currentShop || !originalShop) return false;
+        const state = getShopFormState();
+        if (!state) return false;
+        return state.name !== originalShop.name ||
+            JSON.stringify(state.sections) !== JSON.stringify(originalShop.sections);
     }
 
     async function selectList(name) {
@@ -706,6 +979,180 @@
             label.textContent = "Failed";
             btn.classList.add("failure");
             setTimeout(() => { label.textContent = "Sync"; btn.disabled = false; btn.classList.remove("failure"); }, 2500);
+        }
+    }
+
+    // --- Shop operations ---
+    async function loadShops() {
+        try {
+            shops = await api("GET", "/shops");
+            renderSidebar();
+        } catch (e) {
+            shops = [];
+            renderSidebar();
+        }
+    }
+
+    async function selectShop(id) {
+        if (hasUnsavedShopChanges() && !confirm("You have unsaved changes. Discard them?")) return;
+        try {
+            const shop = await api("GET", `/shops/${encodeURIComponent(id)}`);
+            currentShop = shop;
+            originalShop = JSON.parse(JSON.stringify(shop));
+            renderSidebar();
+            renderShopEditor();
+            closeSidebar();
+        } catch (e) {
+            alert("Failed to load store.");
+        }
+    }
+
+    function renderShopEditor() {
+        const shop = currentShop;
+        const sectionsHtml = shop.sections.map((s, i) => `
+            <div class="section-row">
+                <span class="section-num">${i + 1}</span>
+                <input type="text" value="${escapeHtml(s)}" oninput="updateSection(${i}, this.value)" placeholder="Section name">
+                <button class="move-btn" onclick="moveSection(${i}, -1)" ${i === 0 ? 'disabled' : ''} aria-label="Move up">&#9650;</button>
+                <button class="move-btn" onclick="moveSection(${i}, 1)" ${i === shop.sections.length - 1 ? 'disabled' : ''} aria-label="Move down">&#9660;</button>
+                <button class="delete-section-btn" onclick="deleteSection(${i})" aria-label="Remove section">&times;</button>
+            </div>
+        `).join("");
+
+        document.getElementById("editor").innerHTML = `
+            <div class="editor-header">
+                <h2>${escapeHtml(shop.name)}</h2>
+                <span class="unsaved" id="unsaved" style="display:none">unsaved changes</span>
+            </div>
+            <div class="shop-editor">
+                <div class="shop-field">
+                    <label>Store name</label>
+                    <input type="text" id="shop-name" value="${escapeHtml(shop.name)}" oninput="checkShopUnsaved()">
+                </div>
+                <div class="shop-field">
+                    <label>Sections</label>
+                    <div class="section-list" id="section-list">
+                        ${sectionsHtml}
+                    </div>
+                    <button class="add-section-btn" onclick="addSection()" style="margin-top:0.35rem">+ Add section</button>
+                </div>
+            </div>
+            <div class="editor-footer">
+                <button class="save-btn" onclick="saveShop()">Save</button>
+            </div>
+        `;
+    }
+
+    function getShopFormState() {
+        const nameInput = document.getElementById("shop-name");
+        if (!nameInput) return null;
+        const sectionInputs = document.querySelectorAll("#section-list .section-row input");
+        const sections = Array.from(sectionInputs).map(el => el.value);
+        return { name: nameInput.value, sections };
+    }
+
+    function checkShopUnsaved() {
+        const indicator = document.getElementById("unsaved");
+        if (indicator) indicator.style.display = hasUnsavedShopChanges() ? "inline" : "none";
+    }
+
+    function updateSection(index, value) {
+        currentShop.sections[index] = value;
+        checkShopUnsaved();
+    }
+
+    function moveSection(index, direction) {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= currentShop.sections.length) return;
+        const state = getShopFormState();
+        if (state) {
+            currentShop.sections = state.sections;
+            currentShop.name = state.name;
+        }
+        const temp = currentShop.sections[index];
+        currentShop.sections[index] = currentShop.sections[newIndex];
+        currentShop.sections[newIndex] = temp;
+        renderShopEditor();
+        checkShopUnsaved();
+    }
+
+    function deleteSection(index) {
+        const state = getShopFormState();
+        if (state) {
+            currentShop.sections = state.sections;
+            currentShop.name = state.name;
+        }
+        currentShop.sections.splice(index, 1);
+        renderShopEditor();
+        checkShopUnsaved();
+    }
+
+    function addSection() {
+        const state = getShopFormState();
+        if (state) {
+            currentShop.sections = state.sections;
+            currentShop.name = state.name;
+        }
+        currentShop.sections.push("");
+        renderShopEditor();
+        const inputs = document.querySelectorAll("#section-list .section-row input");
+        if (inputs.length > 0) inputs[inputs.length - 1].focus();
+        checkShopUnsaved();
+    }
+
+    async function saveShop() {
+        const btn = document.querySelector(".save-btn");
+        const state = getShopFormState();
+        if (!state) return;
+        const sections = state.sections.filter(s => s.trim() !== "");
+        btn.disabled = true;
+        btn.textContent = "Saving...";
+        try {
+            const updated = await api("PUT", `/shops/${encodeURIComponent(currentShop.id)}`, { name: state.name, sections });
+            currentShop = updated;
+            originalShop = JSON.parse(JSON.stringify(updated));
+            renderShopEditor();
+            // Update sidebar in case name changed
+            const idx = shops.findIndex(s => s.id === updated.id);
+            if (idx !== -1) shops[idx] = { id: updated.id, name: updated.name, sections: updated.sections };
+            renderSidebar();
+            const saveBtn = document.querySelector(".save-btn");
+            saveBtn.textContent = "Saved!";
+            setTimeout(() => { saveBtn.textContent = "Save"; saveBtn.disabled = false; }, 1500);
+        } catch (e) {
+            btn.textContent = "Error";
+            setTimeout(() => { btn.textContent = "Save"; btn.disabled = false; }, 2000);
+        }
+    }
+
+    async function createNewShop() {
+        const name = prompt("Store name:");
+        if (!name || !name.trim()) return;
+        try {
+            const shop = await api("POST", "/shops", { name: name.trim() });
+            shops.push(shop);
+            shops.sort((a, b) => a.name.localeCompare(b.name));
+            renderSidebar();
+            await selectShop(shop.id);
+        } catch (e) {
+            alert("Failed to create store.");
+        }
+    }
+
+    async function deleteShop(id) {
+        const shop = shops.find(s => s.id === id);
+        if (!shop || !confirm(`Delete "${shop.name}"?`)) return;
+        try {
+            await api("DELETE", `/shops/${encodeURIComponent(id)}`);
+            shops = shops.filter(s => s.id !== id);
+            renderSidebar();
+            if (currentShop && currentShop.id === id) {
+                currentShop = null;
+                originalShop = null;
+                renderEmptyState();
+            }
+        } catch (e) {
+            alert("Failed to delete store.");
         }
     }
 
