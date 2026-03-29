@@ -36,3 +36,28 @@ def test_delete_list_removes_cache(tmp_data_dir):
     (cache_dir / "weekly_test-shop.json").write_text("{}")
     delete_list("weekly")
     assert not (cache_dir / "weekly_test-shop.json").exists()
+
+
+def test_put_list(client, tmp_data_dir):
+    (tmp_data_dir / "lists" / "weekly.md").write_text("- milk\n")
+    response = client.put("/lists/weekly", json={"items": ["eggs", "bread"]})
+    assert response.status_code == 200
+    assert response.json() == {"name": "weekly", "items": ["eggs", "bread"]}
+
+
+def test_put_list_not_found(client):
+    response = client.put("/lists/nonexistent", json={"items": ["eggs"]})
+    assert response.status_code == 404
+
+
+def test_delete_list_endpoint(client, tmp_data_dir):
+    (tmp_data_dir / "lists" / "weekly.md").write_text("- milk\n")
+    response = client.delete("/lists/weekly")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+    assert client.get("/lists/weekly").status_code == 404
+
+
+def test_delete_list_endpoint_not_found(client):
+    response = client.delete("/lists/nonexistent")
+    assert response.status_code == 404

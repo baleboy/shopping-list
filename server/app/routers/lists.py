@@ -2,7 +2,7 @@ import json
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from app.services.list_service import list_lists, get_list, create_list
+from app.services.list_service import list_lists, get_list, create_list, update_list, delete_list
 from app.services.shop_service import get_shop
 from app.services.categorizer import get_or_create_categorized_list, _cache_path
 from app.models import CategorizedList
@@ -12,6 +12,11 @@ router = APIRouter(prefix="/lists", tags=["lists"])
 
 class CreateListRequest(BaseModel):
     name: str
+    items: Optional[List[str]] = None
+
+
+class UpdateListRequest(BaseModel):
+    items: List[str]
 
 
 class ListResponse(BaseModel):
@@ -43,7 +48,24 @@ async def create_new_list(
     from_param: Optional[str] = Query(None, alias="from")
 ):
     items = create_list(body.name, from_master=(from_param == "master"))
+    if body.items is not None:
+        items = update_list(body.name, body.items)
     return ListResponse(name=body.name, items=items)
+
+
+@router.put("/{name}", response_model=ListResponse)
+async def update_list_by_name(name: str, body: UpdateListRequest):
+    items = update_list(name, body.items)
+    if items is None:
+        raise HTTPException(status_code=404, detail="List not found")
+    return ListResponse(name=name, items=items)
+
+
+@router.delete("/{name}")
+async def delete_list_by_name(name: str):
+    if not delete_list(name):
+        raise HTTPException(status_code=404, detail="List not found")
+    return {"status": "ok"}
 
 
 @router.post("/{name}/prepare", response_model=CategorizedList)
