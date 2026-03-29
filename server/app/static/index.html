@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Lists</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* Reset & base */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --cream: #faf7f2;
+            --warm-white: #fffdf9;
+            --sand: #f0e8db;
+            --sand-dark: #e2d5c3;
+            --cocoa: #8b6f47;
+            --cocoa-light: #a68b5b;
+            --cocoa-dark: #6b5535;
+            --espresso: #3d2e1f;
+            --terracotta: #c4704b;
+            --terracotta-light: #e8956e;
+            --sage: #7a9178;
+            --sage-light: #d4e0d3;
+            --charcoal: #2c2c2c;
+            --text: #3d3228;
+            --text-muted: #8a7e72;
+            --border: #e6ddd0;
+            --shadow-sm: 0 1px 3px rgba(61,46,31,0.06);
+            --shadow-md: 0 4px 12px rgba(61,46,31,0.08);
+            --shadow-lg: 0 8px 24px rgba(61,46,31,0.12);
+            --radius: 10px;
+            --radius-lg: 14px;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== Password Screen ===== */
+        #login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--cream);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #login form {
+            background: var(--warm-white);
+            padding: 2.5rem 2rem 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 320px;
+            max-width: 90vw;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        #login .login-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        #login h2 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 1.6rem;
+            color: var(--espresso);
+            margin-bottom: 0.35rem;
+            font-weight: 400;
+        }
+
+        #login .login-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        #login input {
+            display: block;
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            margin-bottom: 0.85rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--cream);
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #login input:focus {
+            outline: none;
+            border-color: var(--cocoa-light);
+            box-shadow: 0 0 0 3px rgba(166,139,91,0.15);
+        }
+
+        #login button {
+            width: 100%;
+            padding: 0.7rem;
+            background: var(--cocoa);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        #login button:hover { background: var(--cocoa-dark); }
+        #login button:active { transform: scale(0.98); }
+
+        #login .error {
+            color: var(--terracotta);
+            font-size: 0.82rem;
+            margin-top: 0.75rem;
+            display: none;
+        }
+
+        /* ===== App Layout ===== */
+        #app {
+            display: none;
+            height: 100vh;
+            height: 100dvh;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Header */
+        .header {
+            background: var(--warm-white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.25rem;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: var(--espresso);
+            flex: 1;
+            letter-spacing: -0.01em;
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--cocoa);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            transition: background 0.15s;
+            font-size: 0;
+        }
+
+        .hamburger:hover { background: var(--sand); }
+
+        .hamburger svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .sync-btn {
+            padding: 0.4rem 0.9rem;
+            background: var(--sage);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .sync-btn:hover { background: #6a8168; }
+        .sync-btn:active { transform: scale(0.97); }
+        .sync-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+        .sync-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+        }
+
+        .sync-btn.success { background: var(--sage); }
+        .sync-btn.failure { background: var(--terracotta); }
+
+        /* Main area */
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            width: 240px;
+            background: var(--warm-white);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            padding: 1rem 1rem 0.5rem;
+        }
+
+        .sidebar-list {
+            flex: 1;
+            padding: 0 0.5rem;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.55rem 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1px;
+            transition: background 0.15s;
+            font-size: 0.92rem;
+        }
+
+        .sidebar-item:hover { background: var(--sand); }
+
+        .sidebar-item.active {
+            background: var(--cocoa);
+            color: white;
+        }
+
+        .sidebar-item.active .delete-btn { color: rgba(255,255,255,0.6); }
+        .sidebar-item.active .delete-btn:hover { color: white; }
+
+        .sidebar-item .item-icon {
+            margin-right: 0.5rem;
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-item.active .item-icon { opacity: 0.9; }
+
+        .sidebar-item span {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sidebar-item .delete-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.15rem;
+            line-height: 1;
+            padding: 0 0.15rem;
+            border-radius: 4px;
+            transition: color 0.15s;
+        }
+
+        .sidebar-item:hover .delete-btn { display: flex; }
+
+        .sidebar-footer {
+            padding: 0.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .new-btn {
+            width: 100%;
+            padding: 0.55rem;
+            background: none;
+            border: 1.5px dashed var(--sand-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--cocoa);
+            font-size: 0.85rem;
+            font-family: inherit;
+            font-weight: 500;
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+        }
+
+        .new-btn:hover {
+            border-color: var(--cocoa-light);
+            background: var(--sand);
+            color: var(--cocoa-dark);
+        }
+
+        /* ===== Editor ===== */
+        .editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.25rem 1.5rem;
+            min-width: 0;
+            background: var(--cream);
+        }
+
+        .editor-header {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .editor-header h2 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--espresso);
+        }
+
+        .unsaved {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--terracotta);
+            background: rgba(196,112,75,0.1);
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+        }
+
+        .editor textarea {
+            flex: 1;
+            width: 100%;
+            padding: 1rem 1.1rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.8;
+            resize: none;
+            background: var(--warm-white);
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .editor textarea:focus {
+            outline: none;
+            border-color: var(--cocoa-light);
+            box-shadow: 0 0 0 3px rgba(166,139,91,0.1);
+        }
+
+        .editor textarea::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .editor-footer {
+            margin-top: 0.85rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .save-btn {
+            padding: 0.55rem 1.8rem;
+            background: var(--cocoa);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: inherit;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .save-btn:hover { background: var(--cocoa-dark); }
+        .save-btn:active { transform: scale(0.97); }
+        .save-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            gap: 0.5rem;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 2.5rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+
+        /* ===== Mobile ===== */
+        @media (max-width: 768px) {
+            .hamburger { display: flex; align-items: center; justify-content: center; }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                z-index: 100;
+                width: 280px;
+                box-shadow: var(--shadow-lg);
+                transform: translateX(-100%);
+                transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(44,44,44,0.35);
+                z-index: 99;
+                opacity: 0;
+                transition: opacity 0.28s ease;
+            }
+
+            .overlay.open {
+                display: block;
+                opacity: 1;
+            }
+
+            .editor {
+                padding: 1rem;
+            }
+
+            .editor-header h2 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Desktop: hide overlay */
+        @media (min-width: 769px) {
+            .overlay { display: none !important; }
+        }
+
+        /* ===== Scrollbar (webkit) ===== */
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--sand-dark); border-radius: 4px; }
+
+        .editor textarea::-webkit-scrollbar { width: 6px; }
+        .editor textarea::-webkit-scrollbar-track { background: transparent; }
+        .editor textarea::-webkit-scrollbar-thumb { background: var(--sand-dark); border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- Password screen -->
+<div id="login">
+    <form onsubmit="return handleLogin(event)">
+        <span class="login-icon" aria-hidden="true">&#128722;</span>
+        <h2>Shopping Lists</h2>
+        <p class="login-subtitle">Enter your password to continue</p>
+        <input type="password" id="password" placeholder="Password" autofocus>
+        <button type="submit">Sign in</button>
+        <div class="error" id="login-error">Incorrect password. Please try again.</div>
+    </form>
+</div>
+
+<!-- App -->
+<div id="app">
+    <div class="header">
+        <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h1>Shopping Lists</h1>
+        <button class="sync-btn" onclick="syncToGit()">
+            <svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            <span>Sync</span>
+        </button>
+    </div>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    <div class="main">
+        <div class="sidebar">
+            <div class="sidebar-label">Your lists</div>
+            <div class="sidebar-list" id="sidebar-list"></div>
+            <div class="sidebar-footer">
+                <button class="new-btn" onclick="createNewList()">+ New list</button>
+            </div>
+        </div>
+        <div class="editor" id="editor">
+            <div class="empty-state">
+                <span class="empty-icon" aria-hidden="true">&#128221;</span>
+                <p>Select or create a list to get started</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let apiKey = localStorage.getItem("apiKey") || "";
+    let lists = [];
+    let currentList = null;
+    let originalContent = "";
+
+    // --- API helpers ---
+    async function api(method, path, body) {
+        const opts = { method, headers: { "X-API-Key": apiKey, "Content-Type": "application/json" } };
+        if (body) opts.body = JSON.stringify(body);
+        const res = await fetch(path, opts);
+        if (res.status === 401) { logout(); throw new Error("Unauthorized"); }
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+    }
+
+    // --- Auth ---
+    function handleLogin(e) {
+        e.preventDefault();
+        apiKey = document.getElementById("password").value;
+        localStorage.setItem("apiKey", apiKey);
+        init();
+        return false;
+    }
+
+    function logout() {
+        apiKey = "";
+        localStorage.removeItem("apiKey");
+        document.getElementById("app").style.display = "none";
+        document.getElementById("login").style.display = "flex";
+        document.getElementById("login-error").style.display = "block";
+    }
+
+    // --- Init ---
+    async function init() {
+        try {
+            lists = await api("GET", "/lists");
+            document.getElementById("login").style.display = "none";
+            document.getElementById("app").style.display = "flex";
+            renderSidebar();
+            if (lists.length > 0) selectList(lists[0]);
+        } catch (e) { /* login screen stays visible */ }
+    }
+
+    // --- Sidebar ---
+    function renderSidebar() {
+        const el = document.getElementById("sidebar-list");
+        el.innerHTML = lists.map(name => `
+            <div class="sidebar-item ${name === currentList ? 'active' : ''}" onclick="selectList('${name.replace(/'/g, "\\'")}')">
+                <span class="item-icon">&#128203;</span>
+                <span>${escapeHtml(name)}</span>
+                <button class="delete-btn" onclick="event.stopPropagation(); deleteList('${name.replace(/'/g, "\\'")}')" aria-label="Delete ${escapeHtml(name)}">&times;</button>
+            </div>
+        `).join("");
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // --- List operations ---
+    function hasUnsavedChanges() {
+        const ta = document.querySelector("#editor textarea");
+        return ta && ta.value !== originalContent;
+    }
+
+    async function selectList(name) {
+        if (hasUnsavedChanges() && !confirm("You have unsaved changes. Discard them?")) return;
+        currentList = name;
+        renderSidebar();
+        const data = await api("GET", `/lists/${encodeURIComponent(name)}`);
+        originalContent = data.items.join("\n");
+        renderEditor(name, originalContent);
+        closeSidebar();
+    }
+
+    function renderEditor(name, content) {
+        document.getElementById("editor").innerHTML = `
+            <div class="editor-header">
+                <h2>${escapeHtml(name)}</h2>
+                <span class="unsaved" id="unsaved" style="display:none">unsaved changes</span>
+            </div>
+            <textarea oninput="checkUnsaved()" placeholder="Add items, one per line...">${escapeHtml(content)}</textarea>
+            <div class="editor-footer">
+                <button class="save-btn" onclick="saveList()">Save</button>
+            </div>
+        `;
+    }
+
+    function checkUnsaved() {
+        const ta = document.querySelector("#editor textarea");
+        const indicator = document.getElementById("unsaved");
+        if (indicator) indicator.style.display = ta.value !== originalContent ? "inline" : "none";
+    }
+
+    async function saveList() {
+        const btn = document.querySelector(".save-btn");
+        const ta = document.querySelector("#editor textarea");
+        const items = ta.value.split("\n").filter(line => line.trim() !== "");
+        btn.disabled = true;
+        btn.textContent = "Saving...";
+        try {
+            await api("PUT", `/lists/${encodeURIComponent(currentList)}`, { items });
+            originalContent = items.join("\n");
+            ta.value = originalContent;
+            checkUnsaved();
+            btn.textContent = "Saved!";
+            setTimeout(() => { btn.textContent = "Save"; btn.disabled = false; }, 1500);
+        } catch (e) {
+            btn.textContent = "Error";
+            setTimeout(() => { btn.textContent = "Save"; btn.disabled = false; }, 2000);
+        }
+    }
+
+    async function createNewList() {
+        const name = prompt("List name:");
+        if (!name || !name.trim()) return;
+        const trimmed = name.trim();
+        await api("POST", "/lists", { name: trimmed });
+        lists.push(trimmed);
+        lists.sort();
+        renderSidebar();
+        await selectList(trimmed);
+    }
+
+    async function deleteList(name) {
+        if (!confirm(`Delete "${name}"?`)) return;
+        await api("DELETE", `/lists/${encodeURIComponent(name)}`);
+        lists = lists.filter(n => n !== name);
+        renderSidebar();
+        if (currentList === name) {
+            currentList = null;
+            document.getElementById("editor").innerHTML = `
+                <div class="empty-state">
+                    <span class="empty-icon" aria-hidden="true">&#128221;</span>
+                    <p>Select or create a list to get started</p>
+                </div>
+            `;
+        }
+    }
+
+    async function syncToGit() {
+        const btn = document.querySelector(".sync-btn");
+        const label = btn.querySelector("span");
+        btn.disabled = true;
+        label.textContent = "Syncing...";
+        btn.classList.remove("success", "failure");
+        try {
+            await api("POST", "/sync");
+            label.textContent = "Synced!";
+            btn.classList.add("success");
+            setTimeout(() => { label.textContent = "Sync"; btn.disabled = false; btn.classList.remove("success"); }, 2000);
+        } catch (e) {
+            label.textContent = "Failed";
+            btn.classList.add("failure");
+            setTimeout(() => { label.textContent = "Sync"; btn.disabled = false; btn.classList.remove("failure"); }, 2500);
+        }
+    }
+
+    // --- Mobile sidebar ---
+    function toggleSidebar() {
+        document.querySelector(".sidebar").classList.toggle("open");
+        document.querySelector(".overlay").classList.toggle("open");
+    }
+
+    function closeSidebar() {
+        document.querySelector(".sidebar").classList.remove("open");
+        document.querySelector(".overlay").classList.remove("open");
+    }
+
+    // --- Boot ---
+    if (apiKey) init();
+</script>
+</body>
+</html>
